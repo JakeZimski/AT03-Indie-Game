@@ -28,6 +28,8 @@ public class MenuButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
     {
         TryGetComponent(out image);
         transform.parent.TryGetComponent(out instance);
+        image.color = defaultColour;
+        Debug.Log("Button Selected");
     }
 
     private void Start()
