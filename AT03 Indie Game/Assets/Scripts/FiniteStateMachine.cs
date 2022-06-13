@@ -7,7 +7,7 @@ public class FiniteStateMachine : MonoBehaviour
 
     protected IState entryState;
 
-    public IState CurrentState { get; private set;  }
+    protected IState CurrentState { get; private set;  }
 
     protected virtual void Awake()
     {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class Enemy : FiniteStateMachine
+public class Enemy : FiniteStateMachine, IInteractable
 {
 
     public Bounds bounds;
@@ -14,9 +14,11 @@ public class Enemy : FiniteStateMachine
     public EnemyChaseState chaseState;
 
     public NavMeshAgent Agent {  get; private set; }
+    public Transform Target { get; private set; }
 
     public Animator Anim { get; private set; }
     public AudioSource AudioSource { get; private set; }
+    public bool ForceChasePlayer { get; private set; } = false;
 
     protected override void Awake()
     {
@@ -36,12 +38,29 @@ public class Enemy : FiniteStateMachine
         {
             Anim = anim; 
         }
+        TargetItem.ObjectiveActivatedEvent += TriggerForceChasePlayer;
     }
 
     // Start is called before the first frame update
     protected override void Start()
     {
         base.Start();
+        if (Vector3.Distance(transform.position, player.position) <= viewRadius)
+        {
+            if(CurrentState.GetType() != typeof(EnemyChaseState))
+            {
+                Debug.Log("Enter chase state");
+                SetState(new EnemyChaseState(this, chaseState));
+            }
+        }
+        else
+        {
+            if (CurrentState.GetType() == typeof(EnemyChaseState))
+            {
+                Debug.Log("Player out of range, enter wander state");
+                SetState(new EnemyWanderState(this, wanderState));
+            }
+        }
         // here we can write custom vode to be executed after the original Start definition is run
     }
 
@@ -51,7 +70,7 @@ public class Enemy : FiniteStateMachine
         base.Update();
         if(Vector3.Distance(transform.position, player.position) <= viewRadius)
         {
-            if(CurrentState.GetType() == typeof(EnemyChaseState))
+            if(CurrentState.GetType() != typeof(EnemyChaseState))
             {
                 Debug.Log("Player in range, entered shase state");
                 SetState(new EnemyChaseState(this, chaseState));
@@ -74,6 +93,20 @@ public class Enemy : FiniteStateMachine
         Gizmos.DrawWireCube(bounds.center, bounds.size);
         Gizmos.color = Color.blue;
         Gizmos.DrawWireSphere(transform.position, viewRadius);
+    }
+
+    public void Activate()
+    {
+        //Set state stun
+    }
+
+    private void TriggerForceChasePlayer()
+    {
+        if(ForceChasePlayer == false)
+        {
+            ForceChasePlayer = true;
+            SetState(chaseState);
+        }
     }
 }
 
@@ -125,7 +158,7 @@ public class EnemyIdleState : EnemyBehaviourState
         Instance.Agent.isStopped = true;
         idleTime = Random.Range(idleTimeRange.x, idleTimeRange.y);
         timer = 0;
-        Instance.Anim.SetBool("IsMoving", false);
+        Instance.Anim.SetBool("isMoving", false);
     }
 
     public override void OnStateExit()
@@ -184,7 +217,7 @@ public class EnemyWanderState : EnemyBehaviourState
         targetPosition = randomPosInBounds;
         Instance.Agent.SetDestination(targetPosition);
         Instance.Anim.SetBool("isMoving", true);
-        Instance.Anim.SetBool("isChasing", true);
+        Instance.Anim.SetBool("isChasing", false);
         Instance.AudioSource.PlayOneShot(wanderClip);
     }
 
@@ -218,6 +251,7 @@ public class EnemyWanderState : EnemyBehaviourState
 [System.Serializable]
 public class EnemyChaseState : EnemyBehaviourState
 {
+    private Vector3 targetPosition;
     [SerializeField]
     private float chaseSpeed = 5f;   
     [SerializeField]
@@ -232,9 +266,10 @@ public class EnemyChaseState : EnemyBehaviourState
     {
         Instance.Agent.isStopped = false;
         Instance.Agent.speed = chaseSpeed;
-        Instance.Anim.SetBool("isMoving", true);
+        Instance.Anim.SetBool("isMoving", false);
         Instance.Anim.SetBool("isChasing", true);
         Instance.AudioSource.PlayOneShot(chaseClip);
+        Instance.Agent.SetDestination(targetPosition);
     }
 
     public override void OnStateExit()
@@ -244,9 +279,20 @@ public class EnemyChaseState : EnemyBehaviourState
 
     public override void OnStateUpdate()
     {
-    if (Vector3.Distance(Instance.transform.position, Instance.player.position) > Instance.viewRadius)
+        if (Vector3.Distance(Instance.transform.position, Instance.player.position) > Instance.viewRadius)
         {
-            Instance.SetState(Instance.wanderState);
+            if(Instance.ForceChasePlayer == true)
+            {
+                Instance.Agent.SetDestination(Instance.player.position);
+            }
+            else
+            {
+                Instance.SetState(Instance.wanderState);
+            }
+        }
+        else
+        {
+            Instance.Agent.SetDestination(Instance.player.position);
         }
     }
 }
