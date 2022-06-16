@@ -12,10 +12,11 @@ public class Enemy : FiniteStateMachine, IInteractable
     public EnemyIdleState idleState;
     public EnemyWanderState wanderState;
     public EnemyChaseState chaseState;
+    public EnemyPatrolState patrolState;
 
     public NavMeshAgent Agent {  get; private set; }
+    public PlayerController Player { get; private set; }
     public Transform Target { get; private set; }
-
     public Animator Anim { get; private set; }
     public AudioSource AudioSource { get; private set; }
     public bool ForceChasePlayer { get; private set; } = false;
@@ -25,6 +26,7 @@ public class Enemy : FiniteStateMachine, IInteractable
         idleState = new EnemyIdleState(this, idleState);
         wanderState = new EnemyWanderState(this, wanderState);
         chaseState = new EnemyChaseState(this, chaseState);
+        patrolState = new EnemyPatrolState(this, patrolState);
         entryState = idleState;
         if(TryGetComponent(out NavMeshAgent agent) == true)
         {
@@ -164,7 +166,7 @@ public class EnemyIdleState : EnemyBehaviourState
     public override void OnStateExit()
     {
         timer = -1;
-        idleTime = 0;
+        idleTime = 3;
         Debug.Log("exiting the idle stage");
     }
 
@@ -172,7 +174,7 @@ public class EnemyIdleState : EnemyBehaviourState
     {
         if(Vector3.Distance(Instance.transform.position, Instance.player.position) <= Instance.viewRadius)
         {
-            Instance.SetState(Instance.chaseState);
+            Instance.SetState(Instance.idleState);
         }
 
         if(timer >= 0)
@@ -180,7 +182,14 @@ public class EnemyIdleState : EnemyBehaviourState
             timer += Time.deltaTime;
             if(timer >= idleTime)
             {
-                Instance.SetState(Instance.wanderState);
+                if(Instance.patrolState.Enabled == true)
+                {
+                    Instance.SetState(Instance.patrolState);
+                }
+                else
+                {
+                    Instance.SetState(Instance.wanderState);
+                }
                 Debug.Log("Exiting Idle state after" + idleTime + "seconds");
             }
         }
@@ -194,7 +203,7 @@ public class EnemyWanderState : EnemyBehaviourState
     private Vector3 targetPosition;
 
     [SerializeField]
-    private float wanderSpeed = 3.5f;
+    private float wanderSpeed = 0.5f;
     [SerializeField]
     private AudioClip wanderClip;
 
@@ -211,7 +220,7 @@ public class EnemyWanderState : EnemyBehaviourState
         Vector3 randomPosInBounds = new Vector3
             (
             Random.Range(-Instance.bounds.extents.x, Instance.bounds.extents.x),
-            Instance.transform.position.y,
+            Instance.bounds.extents.y,
             Random.Range(-Instance.bounds.extents.z, Instance.bounds.extents.z)
             );
         targetPosition = randomPosInBounds;
@@ -219,6 +228,7 @@ public class EnemyWanderState : EnemyBehaviourState
         Instance.Anim.SetBool("isMoving", true);
         Instance.Anim.SetBool("isChasing", false);
         Instance.AudioSource.PlayOneShot(wanderClip);
+        Debug.Log("Wander state entered with a target pos of " + targetPosition);
     }
 
     public override void OnStateExit()
@@ -294,5 +304,70 @@ public class EnemyChaseState : EnemyBehaviourState
         {
             Instance.Agent.SetDestination(Instance.player.position);
         }
+    }
+}
+
+[System.Serializable]
+public class EnemyPatrolState : EnemyBehaviourState
+{
+    [SerializeField] private bool enabled = false;
+    [SerializeField] private Transform[] waypoints;
+
+    private int currentIndex = 0;
+
+    public bool Enabled { get { return enabled; } }
+    public EnemyPatrolState(Enemy instance, EnemyPatrolState patrolState) : base(instance)
+    {
+        waypoints = patrolState.waypoints;
+        enabled = patrolState.enabled;
+    }
+
+    public override void OnStateEnter()
+    {
+        if(Vector3.Distance(Instance.transform.position, waypoints[currentIndex].position) <= Instance.Agent.stoppingDistance)
+        {
+            currentIndex++;
+            if(currentIndex >= waypoints.Length)
+            {
+                currentIndex = 0;
+            }
+        }
+        Instance.Agent.isStopped = false;
+        Instance.Agent.SetDestination(waypoints[currentIndex].position);
+    }
+
+    public override void OnStateExit()
+    {
+        
+    }
+
+    public override void OnStateUpdate()
+    {
+        if (Vector3.Distance(Instance.transform.position, waypoints[currentIndex].position) <= Instance.Agent.stoppingDistance)
+        {
+            Instance.SetState(Instance.idleState);
+        }
+    }
+}
+
+public class GameOverState : EnemyBehaviourState
+{
+    public GameOverState(Enemy instance, GameOverState gameover) : base(instance)
+    {
+
+    }
+    public override void OnStateEnter()
+    {
+
+    }
+
+    public override void OnStateExit()
+    {
+        
+    }
+
+    public override void OnStateUpdate()
+    {
+        
     }
 }
