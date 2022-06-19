@@ -8,12 +8,15 @@ public class Enemy : FiniteStateMachine, IInteractable
 
     public Bounds bounds;
     public float viewRadius = 5f;
+    public float stunCooldown = 3f;
     public Transform player;
     public EnemyIdleState idleState;
     public EnemyWanderState wanderState;
     public EnemyChaseState chaseState;
     public EnemyPatrolState patrolState;
+    public StunState stunState;
 
+    private float cooldownTimer = -1;
     public NavMeshAgent Agent {  get; private set; }
     public PlayerController Player { get; private set; }
     public Transform Target { get; private set; }
@@ -27,6 +30,7 @@ public class Enemy : FiniteStateMachine, IInteractable
         wanderState = new EnemyWanderState(this, wanderState);
         chaseState = new EnemyChaseState(this, chaseState);
         patrolState = new EnemyPatrolState(this, patrolState);
+        stunState = new StunState(this, stunState);
         entryState = idleState;
         if(TryGetComponent(out NavMeshAgent agent) == true)
         {
@@ -99,9 +103,18 @@ public class Enemy : FiniteStateMachine, IInteractable
 
     public void Activate()
     {
-        //Set state stun
+        if(cooldownTimer < 0 && CurrentState.GetType() != typeof(StunState))
+        {
+            StartCoroutine(TriggerStun());
+        }
     }
 
+    private IEnumerator TriggerStun()
+    {
+        SetState(stunState);
+        yield return new WaitForSeconds(stunState.StunTime);
+        cooldownTimer = 0;
+    }
     private void TriggerForceChasePlayer()
     {
         if(ForceChasePlayer == false)
@@ -369,5 +382,56 @@ public class GameOverState : EnemyBehaviourState
     public override void OnStateUpdate()
     {
         
+    }
+}
+[System.Serializable]
+public class StunState : EnemyBehaviourState
+{
+    [SerializeField] private float stunTime;
+
+    private float timer = -1;
+
+    public float StunTime { get { return stunTime; } }
+
+    public StunState(Enemy instance, StunState stun) : base(instance)
+    {
+        stunTime = stun.stunTime;
+    }
+    public override void OnStateEnter()
+    {
+        Instance.Agent.isStopped = true;
+        timer = 0;
+    }
+
+    public override void OnStateExit()
+    {
+        
+    }
+
+    public override void OnStateUpdate()
+    {
+        if(timer >= 0)
+        {
+            timer += Time.deltaTime;
+            if(timer >= stunTime)
+            {
+                timer = -1;
+                if(Instance.ForceChasePlayer == false)
+                {
+                    if(Instance.patrolState.Enabled == true)
+                    {
+                        Instance.SetState(Instance.patrolState);
+                    }
+                    else
+                    {
+                        Instance.SetState(Instance.wanderState);
+                    }
+                }
+                else
+                {
+                    Instance.SetState(Instance.chaseState);
+                }
+            }
+        }
     }
 }
