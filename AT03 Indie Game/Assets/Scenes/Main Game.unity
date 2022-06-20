@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657874, g: 0.49641258, b: 0.5748172, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -334,7 +334,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bounds:
     m_Center: {x: 0, y: 0.5, z: 0}
-    m_Extent: {x: 16, y: 2, z: 16}
+    m_Extent: {x: 16, y: 0.4, z: 16}
   viewRadius: 5
   stunCooldown: 3
   player: {fileID: 488059219}
@@ -348,7 +348,7 @@ MonoBehaviour:
     chaseSpeed: 3
     chaseClip: {fileID: 0}
   patrolState:
-    enabled: 0
+    enabled: 1
     waypoints:
     - {fileID: 525404370}
     - {fileID: 392191828}
@@ -434,7 +434,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 405539972}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 10.04, y: 1, z: 7.52}
+  m_LocalPosition: {x: 10.639, y: 1, z: 7.52}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1932104504}
@@ -1636,7 +1636,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1769618451}
   m_LocalRotation: {x: -0.90544665, y: 0.42148718, z: 0.04198145, w: 0.027431326}
-  m_LocalPosition: {x: 1.93, y: 2.12, z: -15.67}
+  m_LocalPosition: {x: 1.484, y: 1.787, z: -16.04}
   m_LocalScale: {x: 100.00001, y: 100, z: 100}
   m_Children: []
   m_Father: {fileID: 673198305}
@@ -1655,7 +1655,7 @@ Light:
   m_Shape: 0
   m_Color: {r: 0.009433985, g: 0.0058294907, b: 0.0058294907, a: 1}
   m_Intensity: 1000
-  m_Range: 5.74
+  m_Range: 4.19
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
   m_CookieSize: 10
@@ -1982,7 +1982,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2071986098}
   m_LocalRotation: {x: -0.90544665, y: 0.42148718, z: 0.04198145, w: 0.027431326}
-  m_LocalPosition: {x: -14.47, y: 2.36, z: 0.91}
+  m_LocalPosition: {x: -14.14, y: 2.63, z: 0.92}
   m_LocalScale: {x: 100.00001, y: 100, z: 100}
   m_Children: []
   m_Father: {fileID: 673198305}

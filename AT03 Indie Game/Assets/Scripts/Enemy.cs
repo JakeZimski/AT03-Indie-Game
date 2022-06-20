@@ -74,20 +74,12 @@ public class Enemy : FiniteStateMachine, IInteractable
     protected override void Update()
     {
         base.Update();
-        if(Vector3.Distance(transform.position, player.position) <= viewRadius)
+        if (Vector3.Distance(transform.position, player.position) <= viewRadius)
         {
-            if(CurrentState.GetType() != typeof(EnemyChaseState))
+            if (CurrentState.GetType() != typeof(EnemyChaseState))
             {
-                Debug.Log("Player in range, entered shase state");
+                Debug.Log("Player in range, entered chase state");
                 SetState(new EnemyChaseState(this, chaseState));
-            }
-        }
-        else
-        {
-            if(CurrentState.GetType() == typeof(EnemyWanderState))
-            {
-                Debug.Log("Player out of range, entered wander state");
-                SetState(new EnemyWanderState(this, wanderState));
             }
         }
     }
@@ -179,7 +171,7 @@ public class EnemyIdleState : EnemyBehaviourState
     public override void OnStateExit()
     {
         timer = -1;
-        idleTime = 3;
+        idleTime = 2;
         Debug.Log("exiting the idle stage");
     }
 
@@ -256,11 +248,6 @@ public class EnemyWanderState : EnemyBehaviourState
         if(Vector3.Distance(Instance.transform.position, targetPosition) <= Instance.Agent.stoppingDistance)
         {
             Instance.SetState(Instance.idleState);
-        }
-
-        if(Vector3.Distance(Instance.transform.position, Instance.player.position) > Instance.viewRadius)
-        {
-            Instance.SetState(Instance.wanderState);
         }
     }
 
@@ -347,6 +334,8 @@ public class EnemyPatrolState : EnemyBehaviourState
         }
         Instance.Agent.isStopped = false;
         Instance.Agent.SetDestination(waypoints[currentIndex].position);
+        Instance.Anim.SetBool("isMoving", true);
+        Instance.Anim.SetBool("isChasing", false);
     }
 
     public override void OnStateExit()
