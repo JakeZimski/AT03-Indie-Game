@@ -13,6 +13,7 @@ public class Interaction : MonoBehaviour
         {
             if(Physics.Raycast(transform.position, transform.forward, out RaycastHit hit, disctance) == true)
             {
+                HUD.Instance.SetCrosshairColour(Color.green);
                 if(hit.transform.TryGetComponent(out IInteractable interaction) == true)
                 {
                     Debug.DrawRay(transform.position, transform.forward * disctance, Color.green, 0.2f);
@@ -20,6 +21,7 @@ public class Interaction : MonoBehaviour
                 }
                 else
                 {
+                    HUD.Instance.SetCrosshairColour(Color.red);
                     Debug.DrawRay(transform.position, transform.forward * disctance, Color.red, 0.2f);
                 }
             }
