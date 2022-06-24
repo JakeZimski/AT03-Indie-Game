@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class HUD : MonoBehaviour
 {
@@ -9,6 +10,10 @@ public class HUD : MonoBehaviour
     [SerializeField] private Text objectiveTxt;
     [SerializeField] private string objectiveA;
     [SerializeField] private string objectiveB;
+    [SerializeField] private GameObject promptPanel;
+    [SerializeField] private Text promptText;
+    [SerializeField] [TextArea] private string victoryMessage;
+    [SerializeField] [TextArea] private string gameoverMessage;
 
     public static HUD Instance { get; private set; }
 
@@ -23,6 +28,7 @@ public class HUD : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        promptPanel.SetActive(false);
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
         objectiveTxt.text = objectiveA;
@@ -44,5 +50,25 @@ public class HUD : MonoBehaviour
         {
             crosshairImg.color = colour;
         }
+    }
+
+    public void ActivateEndPrompt (bool victory)
+    {
+        promptPanel.SetActive(true);
+        if(victory == true)
+        {
+            promptText.text = victoryMessage;
+        }
+        else
+        {
+            promptText.text = gameoverMessage;
+        }
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.Confined;
+    }
+
+    public void LoadFirstSceneInBuld()
+    {
+        SceneManager.LoadScene(0);
     }
 }

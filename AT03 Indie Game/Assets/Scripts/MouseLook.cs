@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class MouseLook : MonoBehaviour
 {
+    public static bool mouseDirectionEnabled;
     public float sensitivity = 2.5f; // sensitivity of the camera
     public float drag = 1.5f; // continued mouse movement after input steps
 

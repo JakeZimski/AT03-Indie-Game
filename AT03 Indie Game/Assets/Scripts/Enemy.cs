@@ -32,6 +32,8 @@ public class Enemy : FiniteStateMachine, IInteractable
         patrolState = new EnemyPatrolState(this, patrolState);
         stunState = new StunState(this, stunState);
         entryState = idleState;
+        TargetItem.ObjectiveActivatedEvent += TriggerForceChasePlayer;
+        EndTrigger.VictoryEvent += delegate { SetState(new GameOverState(this)); };
         if(TryGetComponent(out NavMeshAgent agent) == true)
         {
             Agent = agent;
@@ -76,10 +78,19 @@ public class Enemy : FiniteStateMachine, IInteractable
         base.Update();
         if (Vector3.Distance(transform.position, player.position) <= viewRadius)
         {
-            if (CurrentState.GetType() != typeof(EnemyChaseState))
+            if (CurrentState.GetType() != typeof(EnemyChaseState) && CurrentState.GetType() != typeof(GameOverState) && CurrentState.GetType() != typeof(StunState))
             {
                 Debug.Log("Player in range, entered chase state");
                 SetState(new EnemyChaseState(this, chaseState));
+            }
+        }
+
+        if(cooldownTimer >= 0)
+        {
+            cooldownTimer += Time.deltaTime;
+            if(cooldownTimer >= stunCooldown)
+            {
+                cooldownTimer = -1;
             }
         }
     }
@@ -164,7 +175,7 @@ public class EnemyIdleState : EnemyBehaviourState
     {
         Instance.Agent.isStopped = true;
         idleTime = Random.Range(idleTimeRange.x, idleTimeRange.y);
-        timer = 0;
+        timer = 1;
         Instance.Anim.SetBool("isMoving", false);
     }
 
@@ -244,7 +255,7 @@ public class EnemyWanderState : EnemyBehaviourState
     public override void OnStateUpdate()
     {
         Vector3 t = targetPosition;
-        t.y = 0;
+        t.y = 3;
         if(Vector3.Distance(Instance.transform.position, targetPosition) <= Instance.Agent.stoppingDistance)
         {
             Instance.SetState(Instance.idleState);
@@ -302,7 +313,14 @@ public class EnemyChaseState : EnemyBehaviourState
         }
         else
         {
-            Instance.Agent.SetDestination(Instance.player.position);
+            if (Vector3.Distance(Instance.transform.position, Instance.player.position) <= Instance.Agent.stoppingDistance)
+            {
+                Instance.SetState(new GameOverState(Instance));
+            }
+            else
+            {
+                Instance.Agent.SetDestination(Instance.player.position);
+            }
         }
     }
 }
@@ -354,13 +372,15 @@ public class EnemyPatrolState : EnemyBehaviourState
 
 public class GameOverState : EnemyBehaviourState
 {
-    public GameOverState(Enemy instance, GameOverState gameover) : base(instance)
+    public GameOverState(Enemy instance) : base(instance)
     {
 
     }
     public override void OnStateEnter()
     {
-
+        Instance.Agent.isStopped = true;
+        PlayerController.canMove = false;
+        MouseLook.mouseDirectionEnabled = false;
     }
 
     public override void OnStateExit()

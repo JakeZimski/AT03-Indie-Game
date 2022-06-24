@@ -16,6 +16,7 @@ public class PlayerController : MonoBehaviour
     private float velocity = 0;
     private bool crouching = false;
     private bool isGrounded = false;
+    public static bool canMove;
 
     // Awake is called before the start method
     private void Awake()
