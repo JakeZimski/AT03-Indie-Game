@@ -81,7 +81,7 @@ public class MenuButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
     public void OnPointerExit(PointerEventData eventData)
     {
         mouseOver = false;
-        if (image.color == highlightedColour && this != instance.SelectedButton)
+        if(image.color == highlightedColour && this != instance.SelectedButton)
         {
             image.color = defaultColour;
         }

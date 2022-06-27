@@ -38,9 +38,11 @@ public class FiniteStateMachine : MonoBehaviour
         if(CurrentState != null)
         {
             CurrentState.OnStateExit();
+            Debug.Log("Exited " + CurrentState.GetType());
         }
         CurrentState = state;
         CurrentState.OnStateEnter();
+        Debug.Log("Entered " + CurrentState.GetType());
     }
     protected virtual void OnDrawGizmos()
     {

@@ -23,6 +23,7 @@ public class Enemy : FiniteStateMachine, IInteractable
     public Animator Anim { get; private set; }
     public AudioSource AudioSource { get; private set; }
     public bool ForceChasePlayer { get; private set; } = false;
+    public float DistanceToPlayer { get; internal set; }
 
     protected override void Awake()
     {
@@ -378,6 +379,10 @@ public class GameOverState : EnemyBehaviourState
     }
     public override void OnStateEnter()
     {
+        if(Instance.DistanceToPlayer <= Instance.Agent.stoppingDistance)
+        {
+            HUD.Instance.ActivateEndPrompt(false);
+        }
         Instance.Agent.isStopped = true;
         PlayerController.canMove = false;
         MouseLook.mouseDirectionEnabled = false;
@@ -410,6 +415,8 @@ public class StunState : EnemyBehaviourState
     {
         Instance.Agent.isStopped = true;
         timer = 0;
+        Instance.Anim.SetBool("isMoving", false);
+        Instance.Anim.SetBool("isChasing", false);
     }
 
     public override void OnStateExit()

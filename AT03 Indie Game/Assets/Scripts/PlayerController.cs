@@ -16,7 +16,7 @@ public class PlayerController : MonoBehaviour
     private float velocity = 0;
     private bool crouching = false;
     private bool isGrounded = false;
-    public static bool canMove;
+    public static bool canMove = true;
 
     // Awake is called before the start method
     private void Awake()
@@ -78,11 +78,14 @@ public class PlayerController : MonoBehaviour
 
     void ApplyMovement()
     {
-        float inputX = Input.GetAxisRaw("Vertical") * currentSpeed;
-        float inputY = Input.GetAxisRaw("Horizontal") * currentSpeed;
-        motion += transform.forward * inputX * Time.deltaTime;
-        motion += transform.right * inputY * Time.deltaTime;
-        motion.y += velocity * Time.deltaTime;
-        controller.Move(motion);
+        if(canMove == true)
+        {
+            float inputX = Input.GetAxisRaw("Vertical") * currentSpeed;
+            float inputY = Input.GetAxisRaw("Horizontal") * currentSpeed;
+            motion += transform.forward * inputX * Time.deltaTime;
+            motion += transform.right * inputY * Time.deltaTime;
+            motion.y += velocity * Time.deltaTime;
+            controller.Move(motion);
+        }
     }
 }

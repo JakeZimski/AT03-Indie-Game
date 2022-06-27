@@ -712,10 +712,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fc09028baad06be45abd4cade94022a5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gravity: 3.5
+  gravity: 1
   speed: 2.5
   crouchSpeedMultiplier: 0.5
-  jumpForce: 3
+  jumpForce: 1
 --- !u!114 &488059221
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2529,7 +2529,7 @@ MonoBehaviour:
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
+  m_Maskable: 0
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
