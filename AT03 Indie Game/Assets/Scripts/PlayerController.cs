@@ -21,6 +21,7 @@ public class PlayerController : MonoBehaviour
     // Awake is called before the start method
     private void Awake()
     {
+        canMove = true;
         controller = GetComponent<CharacterController>();
     }
 

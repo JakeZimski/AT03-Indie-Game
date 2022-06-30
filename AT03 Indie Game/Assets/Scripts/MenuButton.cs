@@ -28,7 +28,6 @@ public class MenuButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
     {
         TryGetComponent(out image);
         transform.parent.TryGetComponent(out instance);
-        image.color = defaultColour;
         Debug.Log("Button Selected");
     }
 
@@ -39,7 +38,7 @@ public class MenuButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
 
     private void Update()
     {
-        if(mouseOver = true && Input.GetButtonDown("Fire1") == true)
+        if(mouseOver == true && Input.GetButtonDown("Fire1") == true)
         {
             //if selected for the menu is this button
             if(instance.SelectedButton == this)
@@ -94,6 +93,7 @@ public class MenuButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
 
     private void OnSelect()
     {
+        Debug.Log("Select " + name);
         if(instance.SelectedButton != null)
         {
             instance.SelectedButton.image.color = instance.SelectedButton.defaultColour;

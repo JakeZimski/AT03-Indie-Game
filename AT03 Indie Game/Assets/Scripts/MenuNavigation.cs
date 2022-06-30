@@ -9,6 +9,7 @@ public class MenuNavigation : MonoBehaviour
     [SerializeField] private float bufferTime = 0.2f;
 
     private float timer = -1;
+    [SerializeField]
     private int currentButtonIndex = 0;
     private MenuButton currentButton;
 
@@ -44,7 +45,7 @@ public class MenuNavigation : MonoBehaviour
 
     public event MenuInputDelegate VerticalInputEvent = delegate { };
 
-    private void Awake()
+    protected virtual void Awake()
     {
         foreach(MenuButton button in GetComponentsInChildren<MenuButton>())
         {
@@ -54,7 +55,7 @@ public class MenuNavigation : MonoBehaviour
     }
 
     // Start is called before the first frame update
-    void Start()
+    protected virtual void Start()
     {
         if(Buttons.Count > 0)
         {
@@ -63,7 +64,7 @@ public class MenuNavigation : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    protected virtual void Update()
     {
         #region timer functionality
         if (timer < 0)
